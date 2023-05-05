@@ -2,42 +2,7 @@
 #include <stdlib.h>
 #include "bot_functions.h"
 
-// void p2p_pid(int dist) //Point to  Point PID    
-// {   
-//     // PID Controller. Used to control the speed of the bot. Function unverified
-//     double rotatn_req = (dist / WHEEL_DIAMETER); // number of rotations of wheel required to complete given distance
-//     // let encoder giving 'x' number of counts per rotation
 
-//     double setpnt_counts = (rotatn_req) * (counts_per_rotation); // number of counts required to reach the set point(inshort this is our setpoint)
-//     count = 0;
-//     double lasterror = 0, error = 0;
-//     double pv = 0;
-
-//     while (1)
-//     {
-//         error = (setpnt_counts) - (count); // x is the number of encoder counts per revolution
-
-//         if (lasterror == 0)
-//         { // this condition is used to remove intial high gain in velocity
-//             pv = kp1 * error;
-//         }
-//         else
-//         {
-//             pv = kp1 * error + kd1 * (error - lasterror);
-//         }
-
-//         lasterror = error;
-
-//         if (pv >= -0.1 && pv <= 0.1)
-//         { // Assuming lower and upper thresholds of speed of motors are 1, 200 respectively
-//             brake();
-//             break;
-//         }
-
-//         int speed = min(max(pv, -200), 200);
-//         Motor_SetSpeed(speed, speed); // Set the parameters later. these parameters are speed of left and right wheel and will be for forward motion since pv>=0
-//     }
-// }
 
 void p2p_pid(int dist) {
   // PID Controller. Used to control the speed of the bot. Function
