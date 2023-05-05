@@ -153,71 +153,79 @@ void sens_pid()
     }
 }
 
-void turn(int angle)
-{
-    // PID controller for turning the bot by a given angle
-    if((angle<6)&&(angle>(-6))&& angle!=0)  // condition if the angle is between 6 and -6
-    { angle = 360+ angle;} 
-    double theta_in_rad = (angle * 3.14159265359) / 180;
+void turn(int angle) {
+  // PID controller for turning the bot by a given angle
 
-    double distance_turned_for_given_angle = (theta_in_rad * WHEEL_DIAMETER);
-    count = 0; // encoder count
-    double error = 0, lasterror = 0, pv = 0;
+  const int COUNTS_PER_ROTATION = 170;
+  const float WHEEL_DIAMETER = 3.4; 
+  const double kp3 = 0.8;
+  const double kd3 = 0.8;
+  double theta_in_rad = (angle * 3.14159265359) / 180;
 
-    double encoder_Counts_required = (counts_per_rotation * distance_turned_for_given_angle) / (3.14159265359 * WHEEL_DIAMETER);
-    double maxerror = kp3 * encoder_Counts_required + kd3 * (encoder_Counts_required);
+  double distance_turned_for_given_angle = (theta_in_rad * WHEEL_DIAMETER);
+  int count = 0; // encoder count
+  double error = 0, lasterror = 0, pv = 0;
 
-    if (encoder_Counts_required < 0)
-    { // anticlockwise rotation
-        while (1)
-        {
-            error = (-encoder_Counts_required) - (count);
-            pv = kp3 * error + kd3 * (error - lasterror);
-            lasterror = error;
+  double encoder_Counts_required = (COUNTS_PER_ROTATION * distance_turned_for_given_angle) /(3.14159265359 * WHEEL_DIAMETER);
+  // double maxerror = kp3*encoder_Counts_required + kd3*(encoder_Counts_required);
+  if (encoder_Counts_required < 0) { // anticlockwise rotation
 
-            if (pv >= -0.1 && pv <= 0.1)
-            { // upper and lower threshold limits of pv
-                brake();
-                break;
-            }
-            else if (pv > 0)
-            {
-                int speed = min(max(pv, 1), 200);
-                Motor_SetSpeed(-speed, speed);
-            }
-            else
-            {
-                int speed = min(max(pv, -200), -1);
-                Motor_SetSpeed(-speed, speed);
-            }
-        }
+    while (1) {
+      
+      error = (-encoder_Counts_required) - (count);
+
+
+      if (lasterror == 0) {
+        pv = kp3 * error;
+      } else {
+        pv = kp3 * error + kd3 * (error - lasterror);
+      }
+
+      pv = kp3 * error + kd3 * (error - lasterror);
+
+      lasterror = error;
+
+      // map(pv, -maxerror, maxerror, -255, 255);
+      if (pv >= -0.9 && pv <= 0.8) { // upper and lower threshold limits of pv
+        brake();
+        break;
+      } else if (pv > 0) {
+        int speed = min(max(pv, 1), 200);
+        Motor_SetSpeed(-speed, speed);
+      } else {
+        int speed = min(max(pv, -200), -1);
+        Motor_SetSpeed(-speed, speed);
+      }
     }
+  }
 
-    else
-    { // clockwise rotation
-        while (1)
-        {
-            error = (encoder_Counts_required) - (count);
-            pv = kp3 * error + kd3 * (error - lasterror);
-            lasterror = error;
+  else { // clockwise rotation
 
-            if (pv >= -0.1 && pv <= 0.1)
-            {
-                brake();
-                break;
-            }
-            else if (pv > 0)
-            {
-                int speed = min(max(pv, 1), 200);
-                Motor_SetSpeed(speed, -speed);
-            }
-            else
-            {
-                int speed = min(max(pv, -200), -1);
-                Motor_SetSpeed(speed, -speed);
-            }
-        }
+    while (1) {
+
+      error = (encoder_Counts_required) - (count);
+
+      if (lasterror == 0) {
+        pv = kp3 * error;
+      } else {
+        pv = kp3 * error + kd3 * (error - lasterror);
+      }
+      lasterror = error;
+
+      // map(pv, -maxerror, maxerror, -255, 255);
+
+      if (pv >= -0.9 & pv <= 0.8) {
+        brake();
+        break;
+      } else if (pv > 0) {
+        int speed = min(max(pv, 1), 200);
+        Motor_SetSpeed(speed, -speed);
+      } else {
+        int speed = min(max(pv, -200), -1);
+        Motor_SetSpeed(speed, -speed);
+      }
     }
+  }
 }
 
 void composite_pid(int dist){
